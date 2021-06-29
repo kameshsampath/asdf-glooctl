@@ -22,7 +22,7 @@ jobs:
         run: |
           git config --global advice.objectNameWarning false
       - name: "Get Latest Gloo Release"
-        id: gloo-latest-version
+        id: glooctl-latest-version
         uses: actions/github-script@v4.0.1
         with:
           result-encoding: string
@@ -35,12 +35,12 @@ jobs:
             .then(result => { return result.data.tag_name } )
             .catch(err => console.log(err))
       - name: "Latest Version Check"
-        id: asdf-plugin-latest-test
+        id: asdf-glooctl-plugin-latest-test
         uses: kameshsampath/asdf-vm-actions/plugin-test@add-outputs-to-test
         with:
           command: glooctl version
       - name: "Pinned Version Check::1.7.11"
-        id: asdf-istio-plugin-pinned-test
+        id: asdf-glooctl-plugin-pinned-test
         uses: kameshsampath/asdf-vm-actions/plugin-test@add-outputs-to-test
         with:
           command: glooctl version
@@ -48,19 +48,19 @@ jobs:
       - name: "Evaluate Results"
         id: evaluate-test-results
         run: |
-          LATEST_INSTALLED_VERSION=$(echo "${LATEST_STDOUT}" | tail -n1)
-          PINNED_INSTALLED_VERSION=$(echo "${PINNED_STDOUT}" | tail -n1)
+          LATEST_INSTALLED_VERSION=$(echo "${LATEST_STDOUT}" | grep '(?<=Client: {"version":")[0-9]*.[0-9]*.[0-9]*(?=")')
+          PINNED_INSTALLED_VERSION=$(echo "${PINNED_STDOUT}" | '(?<=Client: {"version":")[0-9]*.[0-9]*.[0-9]*(?=")')
 
           INSTALL_RESULT='KO'
-          if [[ "${LATEST_INSTALLED_VERSION}" == "${LATEST_VERSION}" ]] && [[ "${PINNED_INSTALLED_VERSION}" == "1.8.6" ]];
+          if [[ "${LATEST_INSTALLED_VERSION}" == "${LATEST_VERSION}" ]] && [[ "${PINNED_INSTALLED_VERSION}" == "1.7.11" ]];
           then 
              INSTALL_RESULT='OK'
           fi
           echo "::set-output name=release::$INSTALL_RESULT"
         env:
-          LATEST_VERSION: "${{ steps.istio-latest-version.outputs.result }}"
-          LATEST_STDOUT: "${{ join(fromJson(steps.asdf-plugin-latest-test.outputs.stdout).lines,'\n') }}"
-          PINNED_STDOUT: "${{ join(fromJson(steps.asdf-istio-plugin-pinned-test.outputs.stdout).lines,'\n') }}"
+          LATEST_VERSION: "${{ steps.glooctl-latest-version.outputs.result }}"
+          LATEST_STDOUT: "${{ join(fromJson(steps.asdf-glooctl-plugin-latest-test.outputs.stdout).lines,'\n') }}"
+          PINNED_STDOUT: "${{ join(fromJson(steps.asdf-glooctl-plugin-pinned-test.outputs.stdout).lines,'\n') }}"
       - name: Debug
         run: |
           echo "${{ steps.evaluate-test-results.outputs }}"
