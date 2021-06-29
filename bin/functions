@@ -19,7 +19,7 @@ function cache_glooctl_versions {
 	then 
 	  curl_args+=("-H\"Authorization: token $ASDF_GITHUB_API_TOKEN\"")
 	fi
-	curl -s https://github.com/solo-io/gloo/releases | \
+	curl "${curl_args[@]}" https://github.com/solo-io/gloo/releases | \
                   grep -oP '(?<=releases/tag/v)[0-9]*.[0-9]*.[0-9]*' | sort --version-sort > "${CACHE_FILE}"
   fi
 }
@@ -38,12 +38,35 @@ function which_glooctl_version {
 }
 
 function install {	
-	echo "Downloading and installing glooctl $(which_glooctl_version)"
-	curl -sL https://run.solo.io/gloo/install |\
-	   GLOOCTL_VERSION="$(which_glooctl_version)" sh - &
-	wait 
-	mv "$HOME"/.gloo/bin "${ASDF_INSTALL_PATH}"
-	rm -rf "$HOME"/.gloo
+	local gloo_version
+	gloo_version="$(which_glooctl_version)"
+	local os=linux
+	if [ "$(uname -s)" = "Darwin" ]; then
+	  os=darwin
+	fi
+	local goarch=amd64
+	local filename="glooctl-${os}-${goarch}"
+	url="https://github.com/solo-io/gloo/releases/download/${gloo_version}/${filename}" 
+
+	if curl -f "${url}" >/dev/null 2>&1; then
+		echo "Attempting to download glooctl version ${gloo_version}"
+	fi
+
+	echo "Downloading and installing glooctl $(gloo_version)"
+
+	SHA=$(curl -sL "${url}.sha256" | cut -d' ' -f1)
+	curl -sLO "${url}"
+	
+	echo "Download complete!, validating checksum..."
+	checksum=$(openssl dgst -sha256 "${filename}" | awk '{ print $2 }')
+	if [ "$checksum" != "$SHA" ]; then
+		echo "Checksum validation failed." >&2
+		exit 1
+	fi
+  	echo "Checksum valid."
+	
+	mkdir -p "${ASDF_INSTALL_PATH}/bin"
+	mv "${filename}" "${ASDF_INSTALL_PATH}/bin"
 }
 
 function list-all {
