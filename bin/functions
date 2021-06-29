@@ -1,0 +1,61 @@
+#!/usr/bin/env bash
+# shellcheck source=/dev/null
+source "$ASDF_DIR/lib/utils.bash"
+CACHE_DIR="${TMPDIR:-/tmp}/glooctl.releases"
+
+if [ ! -d "${CACHE_DIR}" ]
+then
+    mkdir -p "${CACHE_DIR}"
+fi
+
+trap 'test -d "${TEMP_DIR}" && rm -rf "${TEMP_DIR}"' EXIT
+
+function cache_glooctl_versions {
+ local cache_file="${CACHE_DIR}/glooctl.releases"
+  if [ ! -f "$cache_file" ];
+  then
+	curl -sL https://api.github.com/repos/solo-io/gloo/releases | \
+                  grep -o 'releases/[0-9]*.[0-9]*.[0-9]*/' | sort --version-sort | awk -F'/' '{ print $2}' > "$cache_file"
+  fi
+}
+
+# Determine glooctl version to download
+function which_glooctl_version {
+	cache_glooctl_versions
+	local cache_file="${CACHE_DIR}/glooctl.releases"
+	if [ -z "$ASDF_INSTALL_VERSION" ] || [ "$ASDF_INSTALL_VERSION" == "latest" ];
+	then
+	GLOOCTL_VERSION="$(sort --version-sort < "${cache_file}" | tail -n1)"
+	GLOOCTL_VERSION="${GLOOCTL_VERSION##*/}"
+	else
+	  GLOOCTL_VERSION="${ASDF_INSTALL_VERSION}"
+	fi
+	echo "${GLOOCTL_VERSION}"
+}
+
+function install {	
+	echo "Downloading and installing glooctl $(which_glooctl_version)"
+	curl -sL https://run.solo.io/gloo/install |\
+	   GLOOCTL_VERSION="$(which_glooctl_version)" sh - &
+	wait 
+	mv "$HOME"/.gloo/* "${ASDF_INSTALL_PATH}"
+	rm -rf "$HOME"/.gloo
+}
+
+function list-all {
+	cache_glooctl_versions
+	local cache_file="${CACHE_DIR}/glooctl.releases"
+	tr '\n' ' ' < "$cache_file"
+}
+
+function uninstall {
+   rm -rf "${ASDF_INSTALL_PATH}"
+}
+
+case "$(basename "${0}")" in
+    list-all) list-all
+              ;;
+    install) install
+             ;;
+    uninstall) uninstall ;;
+esac

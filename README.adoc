@@ -1,0 +1,61 @@
+= asdf-vm plugin for Gloo Edge
+
+The https://asdf-vm.com/[asdf-vm] plugin to install and manage multiple https://docs.solo.io/gloo-edge/latest[Gloo Edge] versions.
+
+== Pre-requisites
+
+- https://asdf-vm.com/[asdf-vm]
+- https://www.gnu.org/software/bash/[bash v5.0]
+- https://curl.haxx.se/[curl] or https://www.gnu.org/software/wget/[wget]
+
+== Install
+
+[source,bash]
+----
+asdf plugin-add istio https://github.com/kameshsampath/asdf-glooctl
+----
+
+== Use
+
+Check [asdf](https://asdf-vm.github.io/asdf/) for instructions on how to install & manage versions of Istio.
+
+== List Installable Istio versions
+
+[source,bash]
+----
+asdf list-all glooctl
+----
+
+== Download and install latest
+
+[source,bash]
+----
+asdf install glooctl latest
+----
+
+== Download and install specific version
+
+[source,bash]
+----
+asdf install glooctl 1.6.29
+----
+
+To make your Kubernetes projects use a specific version of Gloo Edge, run the following command from the root of project:
+
+[source,bash]
+----
+# e.g. asdf local glooctl 1.6.29
+asdf local glooctl <glooctl-verison>#<.>
+----
+
+The command will create a `.tools-version` in the local directory pointing. The path will now be adjusted to use the Istio version used in the command
+
+To set a Gloo Edge version globally, run:
+
+[source,bash]
+----
+asdf global glooctl <glooctl-version>
+----
+
+== License
+link:./LICENSE[Apache License v2]
