@@ -10,14 +10,14 @@ fi
 trap 'test -d "${TEMP_DIR}" && rm -rf "${TEMP_DIR}"' EXIT
 
 function cache_glooctl_versions {
- local cache_file="${CACHE_DIR}/glooctl.releases"
+  local cache_file="${CACHE_DIR}/glooctl.releases"
+  echo ">>>> $ASDF_GITHUB_API_TOKEN <<<"
   if [ ! -f "$cache_file" ];
   then
     local curl_args=("-sL")
-	echo ">>>> $ASDF_GITHUB_API_TOKEN <<<"
     if [ -n "$ASDF_GITHUB_API_TOKEN" ];
 	then 
-	  curl_args+=("-H \"Authorization: token $ASDF_GITHUB_API_TOKEN\"")
+	  curl_args+=("-H\"Authorization: token $ASDF_GITHUB_API_TOKEN\"")
 	fi
 	curl -vvv "${curl_args[@]}" https://api.github.com/repos/solo-io/gloo/releases | \
                   grep -o 'releases/[0-9]*.[0-9]*.[0-9]*/' | sort --version-sort | awk -F'/' '{ print $2}' > "$cache_file"
