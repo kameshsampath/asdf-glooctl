@@ -3,3 +3,4 @@ istio-*
 *.log
 *.out
 downloadAndInstallIstio.sh
+glooctl*

@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # shellcheck source=/dev/null
-# set -x 
+#set -x 
 source "$ASDF_DIR/lib/utils.bash"
 CACHE_DIR="${TMPDIR:-/tmp}"
 CACHE_FILE="${CACHE_DIR}glooctl.releases"
@@ -39,7 +39,7 @@ function which_glooctl_version {
 
 function install {	
 	local gloo_version
-	gloo_version="$(which_glooctl_version)"
+	gloo_version="v$(which_glooctl_version)"
 	local os=linux
 	if [ "$(uname -s)" = "Darwin" ]; then
 	  os=darwin
@@ -52,7 +52,7 @@ function install {
 		echo "Attempting to download glooctl version ${gloo_version}"
 	fi
 
-	echo "Downloading and installing glooctl $(gloo_version)"
+	echo "Downloading and installing glooctl ${gloo_version}"
 
 	SHA=$(curl -sL "${url}.sha256" | cut -d' ' -f1)
 	curl -sLO "${url}"
@@ -66,7 +66,8 @@ function install {
   	echo "Checksum valid."
 	
 	mkdir -p "${ASDF_INSTALL_PATH}/bin"
-	mv "${filename}" "${ASDF_INSTALL_PATH}/bin"
+	chmod +x "${filename}"
+	mv "${filename}" "${ASDF_INSTALL_PATH}/bin/glooctl"
 }
 
 function list-all {
