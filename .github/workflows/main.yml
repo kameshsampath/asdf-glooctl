@@ -29,8 +29,8 @@ jobs:
           github-token: ${{secrets.GITHUB_TOKEN}}
           script: |
             return github.repos.getLatestRelease({
-              repo: 'solo-io',
-              owner: 'gloo'
+              repo: 'gloo',
+              owner: 'solo-io'
             })
             .then(result => { return result.data.tag_name } )
             .catch(err => console.log(err))
