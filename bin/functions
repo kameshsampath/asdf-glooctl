@@ -19,7 +19,7 @@ function cache_glooctl_versions {
 	then 
 	  curl_cmd="$curl_cmd -H 'Authorization: token $ASDF_GITHUB_API_TOKEN'"
 	fi
-	"$curl_cmd" https://api.github.com/repos/solo-io/gloo/releases | \
+	"$curl_cmd -vvv https://api.github.com/repos/solo-io/gloo/releases"  | \
                   grep -o 'releases/[0-9]*.[0-9]*.[0-9]*/' | sort --version-sort | awk -F'/' '{ print $2}' > "$cache_file"
   fi
 }
@@ -48,10 +48,7 @@ function install {
 }
 
 function list-all {
-	if [ ! -f "${CACHE_DIR}/glooctl.releases" ];
-	then 
-		cache_glooctl_versions
-	fi
+	cache_glooctl_versions
 	local cache_file="${CACHE_DIR}/glooctl.releases"
 	tr '\n' ' ' < "$cache_file"
 }
