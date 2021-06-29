@@ -21,16 +21,16 @@ jobs:
       - name: "Git Config"
         run: |
           git config --global advice.objectNameWarning false
-      - name: "Get Latest Istio Release"
-        id: istio-latest-version
+      - name: "Get Latest Gloo Release"
+        id: gloo-latest-version
         uses: actions/github-script@v4.0.1
         with:
           result-encoding: string
           github-token: ${{secrets.GITHUB_TOKEN}}
           script: |
             return github.repos.getLatestRelease({
-              repo: 'istio',
-              owner: 'istio'
+              repo: 'solo-io',
+              owner: 'gloo'
             })
             .then(result => { return result.data.tag_name } )
             .catch(err => console.log(err))
@@ -38,13 +38,13 @@ jobs:
         id: asdf-plugin-latest-test
         uses: kameshsampath/asdf-vm-actions/plugin-test@add-outputs-to-test
         with:
-          command: istioctl version --short --remote=false
-      - name: "Pinned Version Check::1.8.6"
+          command: glooctl version
+      - name: "Pinned Version Check::1.7.11"
         id: asdf-istio-plugin-pinned-test
         uses: kameshsampath/asdf-vm-actions/plugin-test@add-outputs-to-test
         with:
-          command: istioctl version --short --remote=false
-          version: 1.8.6
+          command: glooctl version
+          version: 1.7.11
       - name: "Evaluate Results"
         id: evaluate-test-results
         run: |
