@@ -48,11 +48,12 @@ jobs:
       - name: "Evaluate Results"
         id: evaluate-test-results
         run: |
-          LATEST_INSTALLED_VERSION=$(echo "${LATEST_STDOUT}" | grep '(?<=Client: {"version":")[0-9]*.[0-9]*.[0-9]*(?=")')
-          PINNED_INSTALLED_VERSION=$(echo "${PINNED_STDOUT}" | '(?<=Client: {"version":")[0-9]*.[0-9]*.[0-9]*(?=")')
+          LATEST_INSTALLED_VERSION=$(echo "${LATEST_STDOUT}" | grep -oP '(?<=Client: {"version":")[0-9]*.[0-9]*.[0-9]*(?=")')
+
+          PINNED_INSTALLED_VERSION=$(echo "${PINNED_STDOUT}" | grep -oP '(?<=Client: {"version":")[0-9]*.[0-9]*.[0-9]*(?=")')
 
           INSTALL_RESULT='KO'
-          if [[ "${LATEST_INSTALLED_VERSION}" == "${LATEST_VERSION}" ]] && [[ "${PINNED_INSTALLED_VERSION}" == "1.7.11" ]];
+          if [[ "v${LATEST_INSTALLED_VERSION}" == "${LATEST_VERSION}" ]] && [[ "${PINNED_INSTALLED_VERSION}" == "1.7.11" ]];
           then 
              INSTALL_RESULT='OK'
           fi
