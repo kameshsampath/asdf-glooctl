@@ -43,7 +43,10 @@ function install {
 }
 
 function list-all {
-	cache_glooctl_versions
+	if [ ! -f "${CACHE_DIR}/glooctl.releases" ];
+	then 
+		cache_glooctl_versions
+	fi
 	local cache_file="${CACHE_DIR}/glooctl.releases"
 	tr '\n' ' ' < "$cache_file"
 }
