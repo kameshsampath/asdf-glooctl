@@ -3,7 +3,7 @@
 #set -x 
 source "$ASDF_DIR/lib/utils.bash"
 CACHE_DIR="${TMPDIR:-/tmp}"
-CACHE_FILE="${CACHE_DIR}glooctl.releases"
+CACHE_FILE="${CACHE_DIR}/glooctl.releases"
 if [ ! -d "${CACHE_DIR}" ]
 then
     mkdir -p "${CACHE_DIR}"
