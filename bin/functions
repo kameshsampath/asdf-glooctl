@@ -2,7 +2,6 @@
 # shellcheck source=/dev/null
 source "$ASDF_DIR/lib/utils.bash"
 CACHE_DIR="${TMPDIR:-/tmp}/glooctl.releases"
-
 if [ ! -d "${CACHE_DIR}" ]
 then
     mkdir -p "${CACHE_DIR}"
@@ -14,12 +13,12 @@ function cache_glooctl_versions {
  local cache_file="${CACHE_DIR}/glooctl.releases"
   if [ ! -f "$cache_file" ];
   then
-    local curl_cmd="curl -sL "
+    local curl_args=("-sL")
     if [ -n "$ASDF_GITHUB_API_TOKEN" ];
 	then 
-	  curl_cmd="$curl_cmd -H 'Authorization: token $ASDF_GITHUB_API_TOKEN'"
+	  curl_args+=("-H 'Authorization: token $ASDF_GITHUB_API_TOKEN'")
 	fi
-	"$curl_cmd -vvv https://api.github.com/repos/solo-io/gloo/releases"  | \
+	curl "${curl_args[@]}" https://api.github.com/repos/solo-io/gloo/releases| \
                   grep -o 'releases/[0-9]*.[0-9]*.[0-9]*/' | sort --version-sort | awk -F'/' '{ print $2}' > "$cache_file"
   fi
 }
