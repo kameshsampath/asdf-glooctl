@@ -42,7 +42,7 @@ function install {
 	curl -sL https://run.solo.io/gloo/install |\
 	   GLOOCTL_VERSION="$(which_glooctl_version)" sh - &
 	wait 
-	mv "$HOME"/.gloo/* "${ASDF_INSTALL_PATH}"
+	mv "$HOME"/.gloo/bin "${ASDF_INSTALL_PATH}"
 	rm -rf "$HOME"/.gloo
 }
 
